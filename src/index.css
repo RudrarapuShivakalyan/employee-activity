@@ -84,7 +84,7 @@
 input:focus,
 textarea:focus,
 select:focus {
-  @apply ring-2 ring-blue-500 ring-opacity-50 border-blue-500;
+  @apply ring-2 ring-blue-500/50 border-blue-500;
 }
 
 /* Status Badge Styles */
