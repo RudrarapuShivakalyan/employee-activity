@@ -20,6 +20,11 @@ export default function ApprovalRulesAndTemplates() {
     priority: "medium",
     active: true,
   });
+  const [editingTemplate, setEditingTemplate] = useState(null);
+  const [editingRule, setEditingRule] = useState(null);
+  const [showEditTemplateModal, setShowEditTemplateModal] = useState(false);
+  const [showEditRuleModal, setShowEditRuleModal] = useState(false);
+  const [usingTemplate, setUsingTemplate] = useState(null);
 
   useEffect(() => {
     loadTemplatesAndRules();
@@ -150,6 +155,50 @@ export default function ApprovalRulesAndTemplates() {
     }
   };
 
+  const handleEditTemplate = (template) => {
+    setEditingTemplate(template);
+    setShowEditTemplateModal(true);
+  };
+
+  const handleSaveEditTemplate = () => {
+    if (editingTemplate) {
+      setTemplates(
+        templates.map((t) => (t.id === editingTemplate.id ? editingTemplate : t))
+      );
+      setShowEditTemplateModal(false);
+      setEditingTemplate(null);
+      alert("✅ Template updated successfully!");
+    }
+  };
+
+  const handleUseTemplate = (template) => {
+    setUsingTemplate(template.id);
+    setTimeout(() => {
+      const updatedTemplates = templates.map((t) =>
+        t.id === template.id ? { ...t, usageCount: t.usageCount + 1 } : t
+      );
+      setTemplates(updatedTemplates);
+      setUsingTemplate(null);
+      alert(`✅ Template "${template.name}" applied successfully!`);
+    }, 500);
+  };
+
+  const handleEditRule = (rule) => {
+    setEditingRule(rule);
+    setShowEditRuleModal(true);
+  };
+
+  const handleSaveEditRule = () => {
+    if (editingRule) {
+      setRules(
+        rules.map((r) => (r.id === editingRule.id ? editingRule : r))
+      );
+      setShowEditRuleModal(false);
+      setEditingRule(null);
+      alert("✅ Rule updated successfully!");
+    }
+  };
+
   const getPriorityColor = (priority) => {
     switch (priority) {
       case "high":
@@ -213,10 +262,17 @@ export default function ApprovalRulesAndTemplates() {
               </div>
 
               <div className="flex gap-2 pt-4 border-t">
-                <button className="flex-1 bg-blue-100 text-blue-700 py-2 rounded hover:bg-blue-200 transition text-sm font-medium">
-                  📋 Use Template
+                <button
+                  onClick={() => handleUseTemplate(template)}
+                  disabled={usingTemplate === template.id}
+                  className="flex-1 bg-blue-100 text-blue-700 py-2 rounded hover:bg-blue-200 disabled:bg-blue-300 transition text-sm font-medium"
+                >
+                  {usingTemplate === template.id ? "⏳ Applying..." : "📋 Use Template"}
                 </button>
-                <button className="flex-1 bg-purple-100 text-purple-700 py-2 rounded hover:bg-purple-200 transition text-sm font-medium">
+                <button
+                  onClick={() => handleEditTemplate(template)}
+                  className="flex-1 bg-purple-100 text-purple-700 py-2 rounded hover:bg-purple-200 transition text-sm font-medium"
+                >
                   ✏️ Edit
                 </button>
               </div>
@@ -285,12 +341,15 @@ export default function ApprovalRulesAndTemplates() {
                     </button>
                   </td>
                   <td className="px-4 py-3 flex gap-2">
-                    <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                    <button
+                      onClick={() => handleEditRule(rule)}
+                      className="text-blue-600 hover:text-blue-800 font-medium text-sm hover:underline"
+                    >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDeleteRule(rule.id)}
-                      className="text-red-600 hover:text-red-800 font-medium text-sm"
+                      className="text-red-600 hover:text-red-800 font-medium text-sm hover:underline"
                     >
                       Delete
                     </button>
@@ -364,6 +423,143 @@ export default function ApprovalRulesAndTemplates() {
                 </button>
                 <button
                   onClick={() => setShowTemplateModal(false)}
+                  className="flex-1 bg-gray-300 text-gray-800 py-2 rounded-lg hover:bg-gray-400 transition font-medium"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Template Modal */}
+      {showEditTemplateModal && editingTemplate && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+            <h2 className="text-xl font-bold mb-4">Edit Template</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Template Name</label>
+                <input
+                  type="text"
+                  value={editingTemplate.name}
+                  onChange={(e) => setEditingTemplate({ ...editingTemplate, name: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                  value={editingTemplate.description}
+                  onChange={(e) => setEditingTemplate({ ...editingTemplate, description: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows="2"
+                ></textarea>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Max Hours</label>
+                <input
+                  type="number"
+                  value={editingTemplate.maxHours}
+                  onChange={(e) => setEditingTemplate({ ...editingTemplate, maxHours: parseInt(e.target.value) })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <label className="flex items-center gap-2 p-3 bg-gray-50 rounded cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={editingTemplate.requiresFollowup}
+                  onChange={(e) => setEditingTemplate({ ...editingTemplate, requiresFollowup: e.target.checked })}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm font-medium">Requires Follow-up</span>
+              </label>
+              <label className="flex items-center gap-2 p-3 bg-gray-50 rounded cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={editingTemplate.needsDocumentation}
+                  onChange={(e) => setEditingTemplate({ ...editingTemplate, needsDocumentation: e.target.checked })}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm font-medium">Needs Documentation</span>
+              </label>
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={handleSaveEditTemplate}
+                  className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition font-medium"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setShowEditTemplateModal(false)}
+                  className="flex-1 bg-gray-300 text-gray-800 py-2 rounded-lg hover:bg-gray-400 transition font-medium"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Rule Modal */}
+      {showEditRuleModal && editingRule && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+            <h2 className="text-xl font-bold mb-4">Edit Rule</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Rule Name</label>
+                <input
+                  type="text"
+                  value={editingRule.name}
+                  onChange={(e) => setEditingRule({ ...editingRule, name: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Condition</label>
+                <input
+                  type="text"
+                  value={editingRule.condition}
+                  onChange={(e) => setEditingRule({ ...editingRule, condition: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Action</label>
+                <select
+                  value={editingRule.action}
+                  onChange={(e) => setEditingRule({ ...editingRule, action: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="notify">Notify</option>
+                  <option value="fast-track">Fast Track</option>
+                  <option value="require-justification">Require Justification</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                <select
+                  value={editingRule.priority}
+                  onChange={(e) => setEditingRule({ ...editingRule, priority: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={handleSaveEditRule}
+                  className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition font-medium"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setShowEditRuleModal(false)}
                   className="flex-1 bg-gray-300 text-gray-800 py-2 rounded-lg hover:bg-gray-400 transition font-medium"
                 >
                   Cancel

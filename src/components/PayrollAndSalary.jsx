@@ -4,6 +4,7 @@ export default function PayrollAndSalary() {
   const [payrollData, setPayrollData] = useState(null);
   const [filterYear, setFilterYear] = useState(2026);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(null);
 
   useEffect(() => {
     const mockPayroll = {
@@ -188,14 +189,25 @@ export default function PayrollAndSalary() {
       </div>
 
       {/* Download Options */}
-      <div className="flex gap-3">
-        <button className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
-          📥 Download Latest Payslip
+      <div className="flex gap-3 flex-wrap">
+        <button
+          onClick={handleDownloadPayslip}
+          disabled={downloading === "payslip"}
+          className="flex-1 min-w-40 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:bg-blue-800 transition flex items-center justify-center gap-2 font-medium"
+        >
+          📥 {downloading === "payslip" ? "Downloading..." : "Download Latest Payslip"}
         </button>
-        <button className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2">
-          📊 Download Annual Summary
+        <button
+          onClick={handleDownloadAnnualSummary}
+          disabled={downloading === "annual"}
+          className="flex-1 min-w-40 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:bg-green-800 transition flex items-center justify-center gap-2 font-medium"
+        >
+          📊 {downloading === "annual" ? "Downloading..." : "Download Annual Summary"}
         </button>
-        <button className="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition flex items-center justify-center gap-2">
+        <button
+          onClick={handleEmailPayslip}
+          className="flex-1 min-w-40 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition flex items-center justify-center gap-2 font-medium"
+        >
           📧 Email Payslip
         </button>
       </div>
