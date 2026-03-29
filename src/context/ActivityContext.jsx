@@ -4,6 +4,38 @@ import { useAuth } from "./AuthContext";
 const ActivityContext = createContext();
 export const useActivities = () => useContext(ActivityContext);
 
+// ⭐ DEMO ACTIVITIES FOR MOBILE FALLBACK
+const DEMO_ACTIVITIES = [
+  {
+    id: 1,
+    employeeName: "Rajesh Kumar",
+    department: "IT",
+    date: new Date().toISOString().split('T')[0],
+    description: "Fixed critical bug in authentication module",
+    projectName: "Employee Portal",
+    projectDescription: "Internal employee management system",
+    projectPhase: "Development",
+    hoursWorked: 6,
+    projectDeadline: "2026-04-30",
+    status: "APPROVED",
+    remarks: "Good work on the fix",
+  },
+  {
+    id: 2,
+    employeeName: "Rajesh Kumar",
+    department: "IT",
+    date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
+    description: "Code review and testing",
+    projectName: "Employee Portal",
+    projectDescription: "Internal employee management system",
+    projectPhase: "Testing",
+    hoursWorked: 4,
+    projectDeadline: "2026-04-30",
+    status: "APPROVED",
+    remarks: "Approved",
+  },
+];
+
 export const ActivityProvider = ({ children }) => {
   const { user } = useAuth();
   const [activities, setActivities] = useState(() => {
@@ -32,6 +64,7 @@ export const ActivityProvider = ({ children }) => {
               "Content-Type": "application/json",
               ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
+            timeout: 5000,
           }
         );
 
@@ -43,6 +76,9 @@ export const ActivityProvider = ({ children }) => {
 
         if (!response.ok) {
           console.warn("⚠️ Activities fetch failed", response.status);
+          if (activities.length === 0) {
+            setActivities(DEMO_ACTIVITIES);
+          }
           return;
         }
 
@@ -50,7 +86,11 @@ export const ActivityProvider = ({ children }) => {
         console.log("✅ Activities loaded:", data.length);
         setActivities(data);
       } catch (error) {
-        console.error("⚠️ Could not fetch activities from backend", error);
+        console.warn("❌ Could not fetch activities from backend:", error.message);
+        // Use demo data as fallback
+        if (activities.length === 0) {
+          setActivities(DEMO_ACTIVITIES);
+        }
       }
     };
 

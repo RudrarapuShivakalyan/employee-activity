@@ -3,10 +3,65 @@ import { createContext, useContext, useEffect, useState } from "react";
 const EmployeeContext = createContext();
 export const useEmployees = () => useContext(EmployeeContext);
 
+// ⭐ DEMO EMPLOYEE DATA FOR MOBILE FALLBACK
+const DEMO_EMPLOYEES = [
+  {
+    id: 1,
+    employeeId: "EMP001",
+    name: "Rajesh Kumar",
+    email: "rajesh.kumar@company.com",
+    department: "IT",
+    designation: "Senior Developer",
+    joiningDate: "2020-03-15",
+    salary: 750000,
+    yearsOfExperience: 5,
+    status: "Active",
+    phone: "9876543210",
+    manager: "Priya Sharma",
+    gender: "Male",
+    dateOfBirth: "1995-06-20",
+    address: "Bangalore, Karnataka",
+  },
+  {
+    id: 2,
+    employeeId: "EMP002",
+    name: "Priya Sharma",
+    email: "priya.sharma@company.com",
+    department: "IT",
+    designation: "Manager",
+    joiningDate: "2019-01-10",
+    salary: 1000000,
+    yearsOfExperience: 8,
+    status: "Active",
+    phone: "9876543211",
+    manager: "Admin",
+    gender: "Female",
+    dateOfBirth: "1992-04-15",
+    address: "Bangalore, Karnataka",
+  },
+  {
+    id: 3,
+    employeeId: "EMP003",
+    name: "Amit Patel",
+    email: "amit.patel@company.com",
+    department: "HR",
+    designation: "HR Specialist",
+    joiningDate: "2021-05-20",
+    salary: 600000,
+    yearsOfExperience: 3,
+    status: "Active",
+    phone: "9876543212",
+    manager: "Priya Sharma",
+    gender: "Male",
+    dateOfBirth: "1998-09-10",
+    address: "Bangalore, Karnataka",
+  },
+];
+
 export const EmployeeProvider = ({ children }) => {
   const [employees, setEmployees] = useState(() => {
     const saved = localStorage.getItem("employees");
-    return saved ? JSON.parse(saved) : [];
+    return saved ? JSON.parse(saved) : DEMO_EMPLOYEES;
   });
 
   useEffect(() => {
@@ -22,10 +77,14 @@ export const EmployeeProvider = ({ children }) => {
             "Content-Type": "application/json",
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
+          timeout: 5000,
         });
 
         if (!res.ok) {
-          console.warn("Failed to fetch employees from server", res.status);
+          console.warn("⚠️ Failed to fetch employees from server, using demo data");
+          if (employees.length === 0) {
+            setEmployees(DEMO_EMPLOYEES);
+          }
           return;
         }
 
@@ -34,7 +93,11 @@ export const EmployeeProvider = ({ children }) => {
           setEmployees(data);
         }
       } catch (error) {
-        console.error("Error fetching employees:", error);
+        console.warn("❌ Error fetching employees:", error.message);
+        // Use demo data as fallback
+        if (employees.length === 0) {
+          setEmployees(DEMO_EMPLOYEES);
+        }
       }
     };
 
