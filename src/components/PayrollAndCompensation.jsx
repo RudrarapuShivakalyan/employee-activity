@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 export default function PayrollAndCompensation() {
   const [payrollData, setPayrollData] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState("March 2026");
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [showProcessing, setShowProcessing] = useState(false);
 
   useEffect(() => {
     const mockPayroll = [
@@ -94,6 +96,42 @@ export default function PayrollAndCompensation() {
       pending: 0,
     }
   );
+
+  // ✅ HANDLE DOWNLOAD REPORT
+  const handleDownloadReport = () => {
+    const csvContent = payrollData
+      .map(emp => `${emp.employeeName},${emp.baseSalary},${emp.bonus},${emp.deductions},${emp.netPay}`)
+      .join('\n');
+    
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent));
+    element.setAttribute('download', `payroll_${selectedMonth.replace(' ', '_')}.csv`);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    alert('✅ Payroll report downloaded successfully!');
+  };
+
+  // ✅ HANDLE PROCESS PENDING PAYROLL
+  const handleProcessPayroll = () => {
+    setShowProcessing(true);
+    setTimeout(() => {
+      const updatedData = payrollData.map(emp => ({
+        ...emp,
+        status: "Processed",
+        processedDate: new Date().toISOString().split('T')[0]
+      }));
+      setPayrollData(updatedData);
+      setShowProcessing(false);
+      alert('✅ All pending payroll has been processed successfully!');
+    }, 1500);
+  };
+
+  // ✅ HANDLE VIEW ANALYTICS
+  const handleViewAnalytics = () => {
+    setShowReportModal(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -197,16 +235,77 @@ export default function PayrollAndCompensation() {
 
       {/* Action Buttons */}
       <div className="flex gap-3 flex-wrap">
-        <button className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition font-medium">
+        <button 
+          onClick={handleDownloadReport}
+          className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition font-medium shadow-md">
           📥 Download Payroll Report
         </button>
-        <button className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition font-medium">
-          ✓ Process Pending Payroll
+        <button 
+          onClick={handleProcessPayroll}
+          disabled={showProcessing}
+          className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition font-medium shadow-md disabled:opacity-50">
+          {showProcessing ? '⏳ Processing...' : '✓ Process Pending Payroll'}
         </button>
-        <button className="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition font-medium">
+        <button 
+          onClick={handleViewAnalytics}
+          className="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition font-medium shadow-md">
           📊 View Analytics
         </button>
       </div>
+
+      {/* Analytics Modal */}
+      {showReportModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-96 overflow-auto">
+            <div className="p-6 border-b">
+              <h3 className="text-xl font-bold">📊 Payroll Analytics - {selectedMonth}</h3>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600">Total Salary Cost</p>
+                  <p className="text-2xl font-bold text-blue-600">₹{(totalStats.totalBaseSalary / 100000).toFixed(1)}L</p>
+                </div>
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600">Total Bonus Distribution</p>
+                  <p className="text-2xl font-bold text-green-600">₹{(totalStats.totalBonus / 1000).toFixed(0)}K</p>
+                </div>
+                <div className="bg-orange-50 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600">Total Deductions</p>
+                  <p className="text-2xl font-bold text-orange-600">₹{(totalStats.totalDeductions / 1000).toFixed(0)}K</p>
+                </div>
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600">Total Net Payout</p>
+                  <p className="text-2xl font-bold text-purple-600">₹{(totalStats.totalNetPay / 100000).toFixed(1)}L</p>
+                </div>
+              </div>
+              <div className="border-t pt-4">
+                <p className="text-sm font-semibold text-gray-700">Processing Summary</p>
+                <ul className="mt-2 text-sm text-gray-600 space-y-1">
+                  <li>✓ {totalStats.processed} employees marked as processed</li>
+                  <li>⏳ {totalStats.pending} employees pending payment</li>
+                  <li>Total amount to be disbursed: ₹{(totalStats.totalNetPay / 100000).toFixed(2)}L</li>
+                </ul>
+              </div>
+            </div>
+            <div className="p-6 border-t flex justify-end gap-3">
+              <button
+                onClick={() => setShowReportModal(false)}
+                className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-medium">
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  handleDownloadReport();
+                  setShowReportModal(false);
+                }}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                📥 Download Report
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
