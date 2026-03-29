@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { authAPI } from "../services/api";
 
 const ROLES = ["admin", "manager", "employee"];
 const DEPTS = ["IT", "HR", "Sales", "Finance", "Support", "Marketing"];
@@ -45,21 +46,8 @@ export default function Login() {
     try {
       console.log("🔄 Logging in...");
 
-      // ✅ Call proper login API
-      const res = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Login failed");
-      }
-
-      const data = await res.json();
+      // ✅ Use API service with fallback handling
+      const data = await authAPI.login(email, password);
       console.log("✅ Login successful:", data);
 
       // ✅ Store token and user
@@ -67,7 +55,7 @@ export default function Login() {
       localStorage.setItem("user", JSON.stringify(data.user));
 
       // ✅ Update Auth Context
-      login(formData.email, formData.password);
+      login(email, password);
 
       // 🚀 Redirect based on role
       navigate(`/${data.user.role}`);
