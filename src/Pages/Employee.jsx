@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useActivities } from "../context/ActivityContext";
+import { ErrorBoundary } from "../ErrorBoundary";
 import AddActivity from "./AddActivity";
 import MyActivities from "./MyActivities";
 import LoanApplication from "./LoanApplication";
@@ -453,10 +454,12 @@ export default function Employee() {
 
           {/* PAYROLL TAB */}
           {activeTab === "payroll" && (
-            <div>
-              <h2 className="text-2xl font-bold mb-6 text-gray-800">💰 Payroll & Salary</h2>
-              <PayrollAndSalary />
-            </div>
+            <ErrorBoundary>
+              <div>
+                <h2 className="text-2xl font-bold mb-6 text-gray-800">💰 Payroll & Salary</h2>
+                <PayrollAndSalary />
+              </div>
+            </ErrorBoundary>
           )}
 
           {/* ADD ACTIVITY TAB */}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ErrorBoundary } from "../ErrorBoundary";;
 import ActivityApprovals from "./ActivityApprovals";
 import EmployeeProfileSearch from "./EmployeeProfileSearch";
 import TeamPerformanceDashboard from "../components/TeamPerformanceDashboard";
