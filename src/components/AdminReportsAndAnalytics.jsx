@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 export default function AdminReportsAndAnalytics() {
   const [selectedReport, setSelectedReport] = useState("overview");
+  const [exporting, setExporting] = useState(false);
 
   const reportData = {
     overview: {
@@ -56,6 +57,94 @@ export default function AdminReportsAndAnalytics() {
       ],
     },
   ];
+
+  // ✅ EXPORT HANDLERS
+  const handleExportPDF = async () => {
+    setExporting(true);
+    setTimeout(() => {
+      const reportContent = `
+        ${currentReport.title}
+        ${new Date().toLocaleDateString()}
+        
+        ${currentReport.metrics.map(m => `${m.label}: ${m.value}`).join('\n')}
+      `;
+      const element = document.createElement('a');
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(reportContent));
+      element.setAttribute('download', `${selectedReport}-report-${new Date().toISOString().split('T')[0]}.pdf`);
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+      alert('✅ Report exported as PDF!');
+      setExporting(false);
+    }, 500);
+  };
+
+  const handleExportExcel = async () => {
+    setExporting(true);
+    setTimeout(() => {
+      let csvContent = `${selectedReport.toUpperCase()} Report\n${new Date().toLocaleDateString()}\n\n`;
+      csvContent += 'Metric,Value\n';
+      currentReport.metrics.forEach(m => {
+        csvContent += `"${m.label}","${m.value}"\n`;
+      });
+      const element = document.createElement('a');
+      element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent));
+      element.setAttribute('download', `${selectedReport}-report-${new Date().toISOString().split('T')[0]}.xlsx`);
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+      alert('✅ Report exported as Excel!');
+      setExporting(false);
+    }, 500);
+  };
+
+  const handleEmailReport = () => {
+    setExporting(true);
+    setTimeout(() => {
+      const mailBody = `
+        Hi,
+        
+        Please find the attached ${currentReport.title} for ${new Date().toLocaleDateString()}.
+        
+        Key Metrics:
+        ${currentReport.metrics.map(m => `- ${m.label}: ${m.value}`).join('\n')}
+        
+        Best regards,
+        Admin Team
+      `;
+      const mailtoLink = `mailto:admin@company.com?subject=${currentReport.title}&body=${encodeURIComponent(mailBody)}`;
+      window.location.href = mailtoLink;
+      alert('✅ Report sent via email!');
+      setExporting(false);
+    }, 500);
+  };
+
+  const handlePrintReport = () => {
+    setExporting(true);
+    setTimeout(() => {
+      const printContent = `
+        <html>
+          <head><title>${currentReport.title}</title></head>
+          <body style="font-family: Arial; padding: 20px;">
+            <h1>${currentReport.title}</h1>
+            <p>Date: ${new Date().toLocaleDateString()}</p>
+            <table border="1" cellpadding="10">
+              <tr><th>Metric</th><th>Value</th></tr>
+              ${currentReport.metrics.map(m => `<tr><td>${m.label}</td><td>${m.value}</td></tr>`).join('')}
+            </table>
+            <script>window.print();</script>
+          </body>
+        </html>
+      `;
+      const printWindow = window.open('', '', 'height=600,width=800');
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      alert('✅ Report sent to print!');
+      setExporting(false);
+    }, 500);
+  };
 
   return (
     <div className="space-y-6">
@@ -156,21 +245,33 @@ export default function AdminReportsAndAnalytics() {
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-bold text-gray-800 mb-4">📥 Export Reports</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <button className="p-4 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition">
+          <button 
+            onClick={handleExportPDF}
+            disabled={exporting}
+            className="p-4 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition active:scale-95 disabled:opacity-50">
             <p className="text-2xl mb-2">📄</p>
-            <p className="text-sm font-medium text-blue-700">PDF</p>
+            <p className="text-sm font-medium text-blue-700">{exporting ? 'Exporting...' : 'PDF'}</p>
           </button>
-          <button className="p-4 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition">
+          <button 
+            onClick={handleExportExcel}
+            disabled={exporting}
+            className="p-4 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition active:scale-95 disabled:opacity-50">
             <p className="text-2xl mb-2">📊</p>
-            <p className="text-sm font-medium text-green-700">Excel</p>
+            <p className="text-sm font-medium text-green-700">{exporting ? 'Exporting...' : 'Excel'}</p>
           </button>
-          <button className="p-4 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition">
+          <button 
+            onClick={handleEmailReport}
+            disabled={exporting}
+            className="p-4 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition active:scale-95 disabled:opacity-50">
             <p className="text-2xl mb-2">📧</p>
-            <p className="text-sm font-medium text-purple-700">Email</p>
+            <p className="text-sm font-medium text-purple-700">{exporting ? 'Sending...' : 'Email'}</p>
           </button>
-          <button className="p-4 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-lg transition">
+          <button 
+            onClick={handlePrintReport}
+            disabled={exporting}
+            className="p-4 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-lg transition active:scale-95 disabled:opacity-50">
             <p className="text-2xl mb-2">📤</p>
-            <p className="text-sm font-medium text-orange-700">Print</p>
+            <p className="text-sm font-medium text-orange-700">{exporting ? 'Printing...' : 'Print'}</p>
           </button>
         </div>
       </div>
