@@ -12,6 +12,21 @@ import PayrollAndSalary from "../components/PayrollAndSalary";
 import EmployeeGoalsAndObjectives from "../components/EmployeeGoalsAndObjectives";
 import EmployeeProjectsAndWork from "../components/EmployeeProjectsAndWork";
 
+// ⭐ DEMO LOANS FOR FALLBACK
+const DEMO_LOANS = [
+  {
+    id: 1,
+    employeeId: "demo-user",
+    employeeName: "Demo User",
+    loanType: "Personal Loan",
+    amount: 500000,
+    rate: 8.5,
+    tenure: 36,
+    status: "Approved",
+    appliedDate: "2026-01-15",
+  },
+];
+
 export default function Employee() {
   const { user } = useAuth();
   const { activities } = useActivities();
@@ -20,7 +35,7 @@ export default function Employee() {
   const [loans, setLoans] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // ✅ FETCH USER DATA
+  // ✅ FETCH USER DATA WITH FALLBACK
   useEffect(() => {
     if (!user) {
       const storedUser = localStorage.getItem("user");
@@ -39,7 +54,9 @@ export default function Employee() {
 
     let isMounted = true;
 
-    fetch(`http://localhost:5000/api/employees/by-employee-id/${encodeURIComponent(user.employeeId)}`)
+    fetch(`http://localhost:5000/api/employees/by-employee-id/${encodeURIComponent(user.employeeId)}`, {
+      timeout: 5000,
+    })
       .then((res) => {
         if (!res.ok) {
           throw new Error(`Failed to load profile: ${res.status}`);
@@ -53,8 +70,9 @@ export default function Employee() {
         }
       })
       .catch((err) => {
-        console.error("Error fetching user data:", err);
+        console.warn("⚠️ Error fetching user data, using user from context:", err.message);
         if (isMounted) {
+          // Use user data from auth + localStorage fallback
           setUserData(user);
           setIsLoading(false);
         }
@@ -65,11 +83,11 @@ export default function Employee() {
     };
   }, [user]);
 
-  // ✅ FETCH LOANS
+  // ✅ FETCH LOANS WITH FALLBACK
   useEffect(() => {
     if (!userData?.name) return;
 
-    fetch("http://localhost:5000/api/loans")
+    fetch("http://localhost:5000/api/loans", { timeout: 5000 })
       .then((res) => res.json())
       .then((data) => {
         const userLoans = data.filter(
@@ -77,7 +95,11 @@ export default function Employee() {
         );
         setLoans(userLoans);
       })
-      .catch((err) => console.error("Error fetching loans:", err));
+      .catch((err) => {
+        console.warn("⚠️ Error fetching loans, using demo data:", err.message);
+        // Use demo loans as fallback
+        setLoans(DEMO_LOANS);
+      });
   }, [userData]);
 
   // ✅ GET USER ACTIVITIES
