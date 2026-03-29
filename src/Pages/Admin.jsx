@@ -128,22 +128,27 @@ export default function AdminDashboard() {
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-6 shadow-lg">
-        <div className="flex justify-between items-center gap-4 flex-wrap">
-          <div>
-            <h1 className="text-4xl font-bold">👨‍💼 Professional Admin Dashboard</h1>
-            <p className="text-indigo-100 mt-2">Complete system management, payroll, compliance & advanced analytics</p>
+      <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white p-6 shadow-2xl border-b-4 border-blue-500">
+        <div className="flex justify-between items-center gap-4 flex-wrap max-w-7xl mx-auto">
+          <div className="flex items-center gap-4">
+            <div className="bg-gradient-to-r from-blue-400 to-cyan-400 p-3 rounded-lg">
+              <span className="text-2xl">⚙️</span>
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-200 to-cyan-200 bg-clip-text text-transparent">Employee Activity Management</h1>
+              <p className="text-gray-300 mt-1 text-sm">Admin Portal • System Management & Analytics</p>
+            </div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <a
               href="/dashboard"
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition font-semibold flex items-center gap-2 shadow-md"
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-5 py-2 rounded-lg transition font-semibold flex items-center gap-2 shadow-md text-sm"
             >
-              📊 Analytics
+              📊 Dashboard
             </a>
             <button
               onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition font-semibold flex items-center gap-2 shadow-md"
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-5 py-2 rounded-lg transition font-semibold flex items-center gap-2 shadow-md text-sm"
             >
               🚪 Logout
             </button>

@@ -146,11 +146,16 @@ export default function Employee() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* HEADER */}
-      <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-6 shadow-lg">
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-900 text-white p-6 shadow-2xl border-b-4 border-indigo-500">
         <div className="flex justify-between items-center max-w-6xl mx-auto">
-          <div>
-            <h1 className="text-3xl font-bold">👤 Employee Portal</h1>
-            <p className="text-indigo-100 mt-1">Welcome, {userData.name || userData.fullName}!</p>
+          <div className="flex items-center gap-4">
+            <div className="bg-gradient-to-r from-indigo-400 to-blue-400 p-3 rounded-lg">
+              <span className="text-2xl">👤</span>
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-200 to-blue-200 bg-clip-text text-transparent">Employee Activity Management</h1>
+              <p className="text-gray-300 mt-1">Employee Portal • My Activities & Development</p>
+            </div>
           </div>
           <button
             onClick={handleLogout}

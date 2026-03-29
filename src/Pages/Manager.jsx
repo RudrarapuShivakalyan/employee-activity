@@ -56,12 +56,17 @@ export default function ManagerDashboard() {
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg sticky top-0 z-40">
+      <div className="bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 text-white shadow-2xl sticky top-0 z-40 border-b-4 border-purple-500">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold">Manager Dashboard</h1>
-              <p className="text-blue-100 text-sm mt-1">Welcome back, {manager?.name}</p>
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-r from-purple-400 to-blue-400 p-3 rounded-lg">
+                <span className="text-2xl">👨‍💼</span>
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-200 to-blue-200 bg-clip-text text-transparent">Employee Activity Management</h1>
+                <p className="text-gray-300 text-sm mt-1">Manager Portal • Team Management & Analytics</p>
+              </div>
             </div>
             <button
               onClick={handleLogout}
