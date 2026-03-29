@@ -1,17 +1,18 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 // ✅ DEMO DATA FOR FALLBACK (when backend not available)
-const DEMO_LOGIN = {
+const DEMO_LOGIN = (email = "demo@example.com") => ({
   success: true,
   token: "demo-token-" + Date.now(),
   user: {
     id: "demo-user",
-    email: "demo@example.com",
-    name: "Demo User",
+    email: email,
+    name: email.split("@")[0].replace(".", " ").split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" "),
     role: "employee",
     department: "Engineering",
+    employeeId: "EMP-DEMO",
   }
-};
+});
 
 // ✅ COMMON API CALL FUNCTION
 const apiCall = async (endpoint, options = {}, requireAuth = true) => {
@@ -51,8 +52,18 @@ const apiCall = async (endpoint, options = {}, requireAuth = true) => {
   } catch (error) {
     // ✅ FALLBACK: If backend is not accessible (e.g., localhost on Vercel), use demo data
     if (endpoint === "/auth/login") {
-      console.warn("❌ Backend unavailable. Using demo mode for login.");
-      return DEMO_LOGIN;
+      console.warn("❌ Backend unavailable. Using demo login. Email:", options.body ? JSON.parse(options.body).email : "unknown");
+      
+      // Extract email from request to create user-specific demo account
+      let email = "demo@example.com";
+      try {
+        const body = JSON.parse(options.body || "{}");
+        if (body.email) email = body.email;
+      } catch (e) {
+        // Ignore parse errors
+      }
+      
+      return DEMO_LOGIN(email);
     }
     
     // For other endpoints, return fallback data structure
