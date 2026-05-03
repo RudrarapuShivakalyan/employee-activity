@@ -10,10 +10,12 @@ export default function ActivityLogs() {
   const perPage = 6;
 
   const filtered = activities.filter((a) => {
+    const activityDept = String(a.department || "").toUpperCase();
+    const activityStatus = String(a.status || "").toLowerCase();
     const deptOk =
-      deptFilter === "ALL" || a.department === deptFilter;
+      deptFilter === "ALL" || activityDept === deptFilter.toUpperCase();
     const statusOk =
-      statusFilter === "ALL" || a.status === statusFilter;
+      statusFilter === "ALL" || activityStatus === statusFilter.toLowerCase();
     return deptOk && statusOk;
   });
 
@@ -52,9 +54,9 @@ export default function ActivityLogs() {
           }}
         >
           <option value="ALL">All Status</option>
-          <option value="PENDING">Pending</option>
-          <option value="APPROVED">Approved</option>
-          <option value="REJECTED">Rejected</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
         </select>
       </div>
 
@@ -123,14 +125,16 @@ export default function ActivityLogs() {
 
               <span
                 className={`h-fit text-xs px-3 py-1 rounded font-medium ${
-                  a.status === "APPROVED"
+                  String(a.status).toLowerCase() === "approved"
                     ? "bg-green-100 text-green-700"
-                    : a.status === "REJECTED"
+                    : String(a.status).toLowerCase() === "rejected"
                     ? "bg-red-100 text-red-700"
                     : "bg-yellow-100 text-yellow-700"
                 }`}
               >
-                {a.status}
+                {String(a.status)
+                  .toLowerCase()
+                  .replace(/^./, (char) => char.toUpperCase())}
               </span>
             </div>
           </div>

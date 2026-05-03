@@ -17,7 +17,7 @@ const DEMO_ACTIVITIES = [
     projectPhase: "Development",
     hoursWorked: 6,
     projectDeadline: "2026-04-30",
-    status: "APPROVED",
+    status: "approved",
     remarks: "Good work on the fix",
   },
   {
@@ -31,7 +31,7 @@ const DEMO_ACTIVITIES = [
     projectPhase: "Testing",
     hoursWorked: 4,
     projectDeadline: "2026-04-30",
-    status: "APPROVED",
+    status: "approved",
     remarks: "Approved",
   },
 ];
@@ -115,7 +115,7 @@ export const ActivityProvider = ({ children }) => {
         projectPhase,
         hoursWorked,
         projectDeadline,
-        status: "PENDING",
+        status: "pending",
         remarks: "",
       },
     ]);
@@ -123,14 +123,14 @@ export const ActivityProvider = ({ children }) => {
 
   const approveActivity = (id) => {
     setActivities((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: "APPROVED" } : a))
+      prev.map((a) => (a.id === id ? { ...a, status: "approved" } : a))
     );
   };
 
   const rejectActivity = (id, remarks) => {
     setActivities((prev) =>
       prev.map((a) =>
-        a.id === id ? { ...a, status: "REJECTED", remarks } : a
+        a.id === id ? { ...a, status: "rejected", remarks } : a
       )
     );
   };
